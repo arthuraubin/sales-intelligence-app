@@ -1,0 +1,14 @@
+# Fichiers sensibles
+.env
+
+# Fichiers temporaires Python
+__pycache__/
+*.pyc
+
+# Environnements virtuels
+.venv/
+env/
+
+# Données locales
+*.csv
+*.xlsx
