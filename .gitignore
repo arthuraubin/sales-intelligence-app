@@ -1,14 +1,33 @@
-# Fichiers sensibles
-.env
-
-# Fichiers temporaires Python
+# ------------------------------
+# 📁 FICHIERS TEMPORAIRES PYTHON
+# ------------------------------
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
 *.pyc
+*.pkl
 
-# Environnements virtuels
-.venv/
-env/
+# ------------------------------
+# 🔐 FICHIERS D'ENVIRONNEMENT
+# ------------------------------
+.env*
+*.env
 
-# Données locales
-*.csv
+# ------------------------------
+# 💻 FICHIERS SYSTÈME
+# ------------------------------
+.DS_Store
+
+# ------------------------------
+# 📤 EXPORTS GÉNÉRÉS AUTOMATIQUEMENT
+# ------------------------------
 *.xlsx
+*.pdf
+exports/
+Output/
+
+# ------------------------------
+# 🧪 SCRIPTS TEMPORAIRES À IGNORER
+# ------------------------------
+verifie_extensions_par_fichier.py
