@@ -1,33 +1,45 @@
-# ------------------------------
-# 📁 FICHIERS TEMPORAIRES PYTHON
-# ------------------------------
+# 🔧 Environnements virtuels (le plus important)
+.venv/
+venv/
+
+# 🗂️ Caches & artefacts Python
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.pyc
 *.pkl
+.mypy_cache/
+.pytest_cache/
+.ipynb_checkpoints/
+.ruff_cache/
+.coverage
+dist/
+build/
+*.egg-info/
 
-# ------------------------------
-# 🔐 FICHIERS D'ENVIRONNEMENT
-# ------------------------------
+# 📝 Logs / temporaires
+*.log
+*.tmp
+
+# 🔐 Secrets & env (tu as déjà .env* mais je laisse pour clarté)
 .env*
 *.env
+.streamlit/secrets.toml
 
-# ------------------------------
-# 💻 FICHIERS SYSTÈME
-# ------------------------------
+# 💻 Système / éditeurs
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/
 
-# ------------------------------
-# 📤 EXPORTS GÉNÉRÉS AUTOMATIQUEMENT
-# ------------------------------
-*.xlsx
-*.pdf
+# 📤 Exports & données locales (à adapter selon ton besoin)
 exports/
 Output/
+# Ignore les CSV de tests, mais pas les CSV "source" s’il y en a
+CSV_test/
+# Ou, si tu préfères ignorer tous les CSV d’un répertoire précis :
+# data/*.csv
 
-# ------------------------------
-# 🧪 SCRIPTS TEMPORAIRES À IGNORER
-# ------------------------------
-verifie_extensions_par_fichier.py
+# 🗒️ Gros documents non essentiels
+*.docx

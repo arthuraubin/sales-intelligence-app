@@ -1,4 +1,20 @@
 import pandas as pd
+from io import StringIO
+import numpy as np
+import xml.etree.ElementTree as ET  # Pour parser le XML
+from datetime import datetime  # Pour parser les dates
+from scipy.interpolate import PchipInterpolator
+from fredapi import Fred
+from dotenv import load_dotenv
+import os
+import yfinance as yf
+import requests
+from io import BytesIO
+
+
+
+
+
 try:
     from fredapi import Fred  # Pour accéder à l’API FRED
 except ImportError:
@@ -47,31 +63,92 @@ def get_us_yield_curve_snapshot(api_key: str): # return un  pd.DataFrame
 
 
 # Récupère les données historiques des taux US
-def load_fred_rates(series_dict: dict, start_date: str, api_key: str) -> pd.DataFrame:
+
+def load_fred_rates_treasuries(series_dict: dict, start_date: str, api_key: str) -> pd.DataFrame:
     """
     Récupère l'historique de séries FRED à partir d'une date donnée.
-
-    Parameters:
-        series_dict (dict): Dictionnaire {code_FRED: "label"} ex: {"DGS1": "1Y"}
-        start_date (str): Date de début au format "YYYY-MM-DD"
-        api_key (str): Clé API FRED (obtenue via https://fred.stlouisfed.org/)
-
-    Returns:
-        pd.DataFrame: DataFrame avec les dates en index et une colonne par maturité
     """
-    if Fred is None:
-        raise ImportError("fredapi n'est pas installé. Installez-le avec `pip install fredapi`.")
-
     fred = Fred(api_key=api_key)
     data = {}
 
     for code, label in series_dict.items():
-        try :
-            series = fred.get_series(code,observation_start = start_date)
-            data[label] = series 
+        try:
+            series = fred.get_series(code, observation_start=start_date)
+            data[label] = series
         except Exception as e:
-            print (f"Erreur lors du chargement de {label}({code}):{e}")
-            data[label] = None #On remplit avec None si erreur
-    
-    df = pd.DataFrame(data).dropna() #On retire les lignes incomplètes
+            print(f"Erreur lors du chargement de {label} ({code}) : {e}")
+            # Série vide mais avec un index datetime vide pour éviter l'erreur
+            data[label] = pd.Series([], index=pd.DatetimeIndex([]), dtype=float)
+
+    # Création du DataFrame à partir des séries alignées sur les dates
+    df = pd.DataFrame(data)
+
+    # Retrait des lignes où toutes les colonnes sont vides
+    df = df.dropna(how="all")
+
     return df
+
+
+##########################################################################
+################ Récupération yield curve AAA Zone Euro (BCE) #######################
+##########################################################################
+
+def load_eur_yield_curve_bce(maturities=["1Y", "3Y", "5Y", "10Y", "30Y"]):
+    """
+    Récupère les spot rates (zero-coupon) pour la courbe AAA EUR depuis l'API BCE (endpoint officiel).
+    Retourne un DataFrame avec les maturités en colonnes.
+    """
+
+    # Mapping maturités -> codes BCE
+    maturity_map = {
+        "1Y": "SR_1Y",
+        "2Y": "SR_2Y",
+        "3Y": "SR_3Y",
+        "4Y": "SR_4Y",
+        "5Y": "SR_5Y",
+        "7Y": "SR_7Y",
+        "10Y": "SR_10Y",
+        "15Y": "SR_15Y",
+        "20Y": "SR_20Y",
+        "30Y": "SR_30Y"
+    }
+
+    # Nouveau endpoint API officiel (recommandé)
+    base_url = "https://data-api.ecb.europa.eu/service/data/YC/B.U2.EUR.4F.G_N_A.SV_C_YM.{maturity}?format=csvdata"
+
+    data = {}
+
+    for mat in maturities:
+        code = maturity_map.get(mat)
+        if not code:
+            continue
+
+        url = base_url.format(maturity=code)
+
+        try:
+            r = requests.get(url)
+            if r.status_code == 200:
+                df = pd.read_csv(BytesIO(r.content))
+                df["TIME_PERIOD"] = pd.to_datetime(df["TIME_PERIOD"])
+                df.set_index("TIME_PERIOD", inplace=True)
+                df = df.rename(columns={"OBS_VALUE": mat})
+                data[mat] = df[[mat]]
+            else:
+                print(f"Requête échouée ({r.status_code}) pour {mat}")
+        except Exception as e:
+            print(f"Erreur lors du chargement de {mat} : {e}")
+
+    if not data:
+        print(" Aucun taux n’a pu être récupéré depuis l’API BCE.")
+        return pd.DataFrame()  #  assure que le retour est un DataFrame vide
+
+    df_curve = pd.concat(data.values(), axis=1)
+    df_curve = df_curve.sort_index()
+    df_curve.dropna(how='all', inplace=True)
+
+    return df_curve  
+
+
+    ####################################
+
+
