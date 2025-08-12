@@ -6,8 +6,7 @@ import plotly.graph_objects as go
 
 from Modules.Pricing import (
     payoff_barrier_curve_pedagogique,
-    barrier_price_batch,
-)
+    barrier_price_batch,)
 
 st.set_page_config(page_title="Options Barrières (Pro)", page_icon="🧱", layout="wide")
 st.title("🧱 Options Barrières — Version pro (MC rapide + graphe pédagogique)")

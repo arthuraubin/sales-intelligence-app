@@ -1,0 +1,60 @@
+# ===========================
+# CONFIGURATION VOLATILITÉ
+# ===========================
+
+# --- Paramètres par défaut ---
+default_maturities:  # Liste des maturités par défaut (en années)
+  - 0.25
+  - 0.5
+  - 1
+  - 2
+  - 5
+  - 10
+
+default_strikes:  # Liste des strikes par défaut (en % ou niveau de prix)
+  - 80
+  - 90
+  - 100
+  - 110
+  - 120
+
+# --- Paramètres SABR ---
+sabr_params:  # Paramètres initiaux pour calibration SABR
+  alpha: 0.03   # Volatilité de base
+  beta: 0.5     # Élasticité du taux forward
+  rho: -0.2     # Corrélation entre le forward et la vol
+  nu: 0.4       # Volatilité de la volatilité
+  method: "least_squares"  # Méthode de calibration possible : least_squares, mle
+
+# --- Paramètres de stress test ---
+stress_scenarios:  # Liste des scénarios de stress en multiplicateur
+  - 0.05    # +5%
+  - -0.05   # -5%
+  - 0.10    # +10%
+  - -0.10   # -10%
+
+# --- Paramètres graphiques ---
+plot:
+  cmap: "viridis"         # Colormap pour la surface 3D
+  figsize: [10, 6]        # Taille par défaut des graphiques
+  font_size: 12           # Taille de police
+  show_grid: true         # Afficher la grille sur les graphiques
+  interactive: true       # Utiliser plotly pour affichage interactif si dispo
+
+# --- Fournisseurs de données ---
+data_providers:
+  local_csv: true         # Autoriser l'import CSV local
+  yahoo_finance: true     # Autoriser récupération Yahoo Finance
+  bloomberg_api: false    # Activer si clé API Bloomberg fournie
+  bloomberg_store_key: true  # Mémoriser clé Bloomberg dans session
+
+# --- Filtres de données ---
+filters:
+  min_vol: 0.01           # Volatilité minimale affichée
+  max_vol: 2.0            # Volatilité maximale affichée
+  allowed_assets:         # Classes d'actifs autorisées
+    - FX
+    - Equity
+    - Rates
+    - Credit
+    - Commodities
